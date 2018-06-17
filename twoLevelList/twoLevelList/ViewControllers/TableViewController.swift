@@ -15,10 +15,16 @@ class TableViewController: UITableViewController {
     var last = [Int]()
     var Path = IndexPath()
     var refresher = UIRefreshControl()
+    var activityIndicator = UIActivityIndicatorView()
     
     override func viewDidLoad() {
         super.viewDidLoad()
         title = "Test Case"
+        activityIndicator.center = self.view.center
+        activityIndicator.hidesWhenStopped = true
+        activityIndicator.activityIndicatorViewStyle = UIActivityIndicatorViewStyle.gray
+        view.addSubview(activityIndicator)
+        activityIndicator.startAnimating()
         refresher.attributedTitle = NSAttributedString(string: "Pull to refresh")
         refresher.addTarget(self, action: #selector(TableViewController.refreshData), for: UIControlEvents.valueChanged)
         tableView.addSubview(refresher)
@@ -33,7 +39,9 @@ class TableViewController: UITableViewController {
                 response in
                 guard response.result.isSuccess else
                 {
-                    print("Ошибка при запросе данных \(String(describing: response.result.error))")
+                    self.showAlert(title: "Network error", message: "Please try again later")
+                    self.activityIndicator.stopAnimating()
+                    self.refresher.endRefreshing()
                     return
                 }
                 guard let json = response.data else { return }
@@ -42,11 +50,15 @@ class TableViewController: UITableViewController {
                     let decoder = JSONDecoder()
                     self.data = try decoder.decode(header.self, from: json)
                     self.tableView.reloadData()
+                    self.activityIndicator.stopAnimating()
                     self.refresher.endRefreshing()
                 }
                 catch let err
                 {
-                    print("err ", err)
+                    self.showAlert(title: "Network error", message: "Please try again later")
+                    self.activityIndicator.stopAnimating()
+                    self.refresher.endRefreshing()
+                    print(err)
                     return
                 }
         }
@@ -110,9 +122,12 @@ class TableViewController: UITableViewController {
         {
             if (last.count == 2)
             {
-                Path = IndexPath(row: last[1] + 1, section: last[0])
-                tableView.cellForRow(at: Path)?.accessoryType = UITableViewCellAccessoryType.checkmark
-                data.response![last[0]].children![last[1]].marked = true
+                if (!(data.response?.isEmpty)! && !(data.response![last[0]].children?.isEmpty)!)
+                {
+                    Path = IndexPath(row: last[1] + 1, section: last[0])
+                    tableView.cellForRow(at: Path)?.accessoryType = UITableViewCellAccessoryType.checkmark
+                    data.response![last[0]].children![last[1]].marked = true
+                }
             }
             if data.response![indexPath.section].opened == true
             {
@@ -216,5 +231,20 @@ class TableViewController: UITableViewController {
     override func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
         let delete = deleteAction(at: indexPath)
         return (UISwipeActionsConfiguration(actions: [delete]))
+    }
+    
+    func showAlert(title : String, message: String) {
+        let alert = UIAlertController(
+            title: title,
+            message: message,
+            preferredStyle: UIAlertControllerStyle.alert
+        )
+        let ok = UIAlertAction(
+            title: "OK",
+            style: UIAlertActionStyle.default,
+            handler: nil
+        )
+        alert.addAction(ok)
+        present(alert, animated: true, completion: nil)
     }
 }
