@@ -14,28 +14,18 @@ class TableViewController: UITableViewController {
     var data = header()
     var last = [Int]()
     var Path = IndexPath()
+    var refresher = UIRefreshControl()
     
     override func viewDidLoad() {
         super.viewDidLoad()
         title = "Test Case"
+        refresher.attributedTitle = NSAttributedString(string: "Pull to refresh")
+        refresher.addTarget(self, action: #selector(TableViewController.refreshData), for: UIControlEvents.valueChanged)
+        tableView.addSubview(refresher)
         refreshData()
     }
-    
-    func refreshData()
-    {
-        getData()
-            {
-                completion in
-                if completion != nil
-                {
-                    self.tableView.reloadData()
-                }
-                else
-                {}
-        }
-    }
-    
-    func getData(completion: @escaping (String?) -> Void)
+
+    @objc func refreshData()
     {
         guard let url = URL(string: "https://demo8139132.mockable.io/list") else { return }
         Alamofire.request(url).responseJSON
@@ -51,7 +41,8 @@ class TableViewController: UITableViewController {
                 {
                     let decoder = JSONDecoder()
                     self.data = try decoder.decode(header.self, from: json)
-                    completion("download finished")
+                    self.tableView.reloadData()
+                    self.refresher.endRefreshing()
                 }
                 catch let err
                 {
@@ -86,7 +77,6 @@ class TableViewController: UITableViewController {
         return (1)
     }
 
-    
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         if indexPath.row == 0
         {
@@ -155,13 +145,13 @@ class TableViewController: UITableViewController {
                 }
                 tableView.cellForRow(at: indexPath)?.accessoryType = UITableViewCellAccessoryType.checkmark
                 data.response![indexPath.section].children![indexPath.row - 1].marked = true
+                last.append(indexPath.section)
+                last.append(indexPath.row - 1)
             }
         }
     }
     
     override func tableView(_ tableView: UITableView, didDeselectRowAt indexPath: IndexPath) {
-        print("tyt")
-        print(indexPath)
         last.removeAll()
         if (data.response![indexPath.section].children![indexPath.row - 1].marked == false)
         {
@@ -171,5 +161,60 @@ class TableViewController: UITableViewController {
         last.append(indexPath.section)
         last.append(indexPath.row - 1)
         tableView.cellForRow(at: indexPath as IndexPath)?.accessoryType = .none
+    }
+    
+    func checkSection(indPath: IndexPath)
+    {
+        if (last.count == 2 && indPath.section < last[0])
+        {
+            last[0] -= 1
+        }
+        else if (last.count == 2 && indPath.section == last[0])
+        {
+            last.removeAll()
+        }
+    }
+    
+    func checkCell(indPath: IndexPath)
+    {
+        if (last.count == 2 && indPath.section == last[0])
+        {
+            if (indPath.row - 1 == last[1] || (indPath.row - 1 == 0 && last[1] == 0))
+            {
+                last.removeAll()
+            }
+            else if (indPath.row - 1 <= last[1])
+            {
+                last[1] -= 1
+            }
+        }
+    }
+    
+    func deleteAction(at indexPath: IndexPath) -> UIContextualAction {
+        let action = UIContextualAction(style: .destructive, title: "🗑\nDelete") { (action, view, completion) in
+            if indexPath.row == 0
+            {
+                self.data.response!.remove(at: indexPath.section)
+                self.tableView.deleteSections(IndexSet(integer: indexPath.section), with: .automatic)
+                self.checkSection(indPath: indexPath)
+            } else {
+                self.data.response![indexPath.section].children!.remove(at: indexPath.row - 1)
+                if (self.data.response![indexPath.section].children?.isEmpty)!
+                {
+                    self.Path = IndexPath(row: 0, section: indexPath.section)
+                    self.tableView.cellForRow(at: self.Path)?.accessoryType = UITableViewCellAccessoryType.none
+                }
+                self.tableView.deleteRows(at: [indexPath], with: .automatic)
+                self.checkCell(indPath: indexPath)
+            }
+            completion(true)
+        }
+        action.backgroundColor = UIColor.red
+        return (action)
+    }
+    
+    override func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
+        let delete = deleteAction(at: indexPath)
+        return (UISwipeActionsConfiguration(actions: [delete]))
     }
 }

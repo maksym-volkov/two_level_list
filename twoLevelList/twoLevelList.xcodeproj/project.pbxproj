@@ -15,6 +15,7 @@
 		B456DAB520D29529001431B8 /* Podfile in Resources */ = {isa = PBXBuildFile; fileRef = B456DAB420D29529001431B8 /* Podfile */; };
 		B456DACC20D3E1C6001431B8 /* Model.swift in Sources */ = {isa = PBXBuildFile; fileRef = B456DACB20D3E1C6001431B8 /* Model.swift */; };
 		B456DACE20D44BD4001431B8 /* TableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B456DACD20D44BD4001431B8 /* TableViewController.swift */; };
+		B456DAD620D6D8F3001431B8 /* OpenSans-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = B456DAD520D6D8F3001431B8 /* OpenSans-Regular.ttf */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -30,6 +31,7 @@
 		B456DAB420D29529001431B8 /* Podfile */ = {isa = PBXFileReference; lastKnownFileType = text; path = Podfile; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
 		B456DACB20D3E1C6001431B8 /* Model.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Model.swift; sourceTree = "<group>"; };
 		B456DACD20D44BD4001431B8 /* TableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TableViewController.swift; sourceTree = "<group>"; };
+		B456DAD520D6D8F3001431B8 /* OpenSans-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "OpenSans-Regular.ttf"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -67,6 +69,7 @@
 				B456DAB420D29529001431B8 /* Podfile */,
 				B456DAA120D29204001431B8 /* twoLevelList */,
 				B456DAA020D29204001431B8 /* Products */,
+				B456DAD420D6D8F3001431B8 /* fonts */,
 				3CE0F73C7FDE5795A0B8E424 /* Pods */,
 				2C1D30EFF11803BFADF6361A /* Frameworks */,
 			);
@@ -83,15 +86,39 @@
 		B456DAA120D29204001431B8 /* twoLevelList */ = {
 			isa = PBXGroup;
 			children = (
+				B456DAD720D6DA57001431B8 /* Models */,
+				B456DAD820D6DA57001431B8 /* ViewControllers */,
 				B456DAA220D29204001431B8 /* AppDelegate.swift */,
-				B456DACB20D3E1C6001431B8 /* Model.swift */,
 				B456DAA620D29204001431B8 /* Main.storyboard */,
-				B456DACD20D44BD4001431B8 /* TableViewController.swift */,
 				B456DAA920D29206001431B8 /* Assets.xcassets */,
 				B456DAAB20D29206001431B8 /* LaunchScreen.storyboard */,
 				B456DAAE20D29206001431B8 /* Info.plist */,
 			);
 			path = twoLevelList;
+			sourceTree = "<group>";
+		};
+		B456DAD420D6D8F3001431B8 /* fonts */ = {
+			isa = PBXGroup;
+			children = (
+				B456DAD520D6D8F3001431B8 /* OpenSans-Regular.ttf */,
+			);
+			path = fonts;
+			sourceTree = "<group>";
+		};
+		B456DAD720D6DA57001431B8 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				B456DACB20D3E1C6001431B8 /* Model.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		B456DAD820D6DA57001431B8 /* ViewControllers */ = {
+			isa = PBXGroup;
+			children = (
+				B456DACD20D44BD4001431B8 /* TableViewController.swift */,
+			);
+			path = ViewControllers;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -154,6 +181,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B456DAD620D6D8F3001431B8 /* OpenSans-Regular.ttf in Resources */,
 				B456DAAD20D29206001431B8 /* LaunchScreen.storyboard in Resources */,
 				B456DAAA20D29206001431B8 /* Assets.xcassets in Resources */,
 				B456DAB520D29529001431B8 /* Podfile in Resources */,
