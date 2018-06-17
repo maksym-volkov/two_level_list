@@ -12,10 +12,12 @@ import Alamofire
 class TableViewController: UITableViewController {
 
     var data = header()
+    var last = [Int]()
+    var Path = IndexPath()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         title = "Test Case"
-//        tableView.is
         refreshData()
     }
     
@@ -26,20 +28,6 @@ class TableViewController: UITableViewController {
                 completion in
                 if completion != nil
                 {
-                    //                print(completion!)
-//                    var index = 0
-//                    while (self.data.response?[index] != nil)
-//                    {
-//                        self.data.response![index].opened = false
-//                        index += 1
-//                    }
-//                    for var each in self.data.response!
-//                    {
-//                        print(each.name!)
-////                        print(each.opened!)
-//                        print(each.opened)
-//                        print("-----------")
-//                    }
                     self.tableView.reloadData()
                 }
                 else
@@ -109,6 +97,8 @@ class TableViewController: UITableViewController {
             if !(data.response![indexPath.section].children?.isEmpty)!
             {
                 cell.accessoryType = UITableViewCellAccessoryType.disclosureIndicator
+            } else {
+                cell.accessoryType = UITableViewCellAccessoryType.none
             }
             return (cell)
         } else {
@@ -116,11 +106,10 @@ class TableViewController: UITableViewController {
             cell.textLabel?.text = data.response![indexPath.section].children![indexPath.row - 1].name
             cell.backgroundColor = UIColor.white
             cell.textLabel?.textColor = UIColor.black
-            print(indexPath)
-            if data.response![indexPath.section].children![indexPath.row - 1].marked == false
+            cell.accessoryType = UITableViewCellAccessoryType.none
+            if (last.count == 2 && indexPath.section == last[0] && indexPath.row - 1 == last[1])
             {
-//                print("tyt")
-                cell.accessoryType = UITableViewCellAccessoryType.none
+                cell.accessoryType = UITableViewCellAccessoryType.checkmark
             }
             return (cell)
         }
@@ -129,6 +118,12 @@ class TableViewController: UITableViewController {
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         if indexPath.row == 0
         {
+            if (last.count == 2)
+            {
+                Path = IndexPath(row: last[1] + 1, section: last[0])
+                tableView.cellForRow(at: Path)?.accessoryType = UITableViewCellAccessoryType.checkmark
+                data.response![last[0]].children![last[1]].marked = true
+            }
             if data.response![indexPath.section].opened == true
             {
                 data.response![indexPath.section].opened = false
@@ -142,17 +137,39 @@ class TableViewController: UITableViewController {
         }
         else
         {
-//            tableView.cellForRow(at: indexPath)?.accessoryType == UITableViewCellAccessoryType.checkmark
-            if data.response![indexPath.section].children![indexPath.row].marked == true
+
+            if data.response![indexPath.section].children![indexPath.row - 1].marked == true
             {
+                last.removeAll()
                 tableView.cellForRow(at: indexPath)?.accessoryType = UITableViewCellAccessoryType.none
-                data.response![indexPath.section].children![indexPath.row].marked = false
+                data.response![indexPath.section].children![indexPath.row - 1].marked = false
             }
             else
             {
+                if (last.count == 2)
+                {
+                    Path = IndexPath(row: last[1] + 1, section: last[0])
+                    tableView.cellForRow(at: Path)?.accessoryType = UITableViewCellAccessoryType.none
+                    data.response![last[0]].children![last[1]].marked = false
+                    last.removeAll()
+                }
                 tableView.cellForRow(at: indexPath)?.accessoryType = UITableViewCellAccessoryType.checkmark
-                data.response![indexPath.section].children![indexPath.row].marked = true
+                data.response![indexPath.section].children![indexPath.row - 1].marked = true
             }
         }
+    }
+    
+    override func tableView(_ tableView: UITableView, didDeselectRowAt indexPath: IndexPath) {
+        print("tyt")
+        print(indexPath)
+        last.removeAll()
+        if (data.response![indexPath.section].children![indexPath.row - 1].marked == false)
+        {
+            return
+        }
+        data.response![indexPath.section].children![indexPath.row - 1].marked = false
+        last.append(indexPath.section)
+        last.append(indexPath.row - 1)
+        tableView.cellForRow(at: indexPath as IndexPath)?.accessoryType = .none
     }
 }
